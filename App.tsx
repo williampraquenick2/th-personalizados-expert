@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [cartAnimate, setCartAnimate] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
 
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter(p => p.category === activeCategory);
@@ -51,12 +52,19 @@ const App: React.FC = () => {
     }));
   };
 
+  const toggleSound = () => {
+    setIsMuted(!isMuted);
+  };
+
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  // Video URL logic to handle mute/unmute
+  const videoUrl = `https://player.vimeo.com/video/${VIMEO_VIDEO_ID}?autoplay=1&loop=1&autopause=0&muted=${isMuted ? '1' : '0'}&background=1&quality=1080p`;
 
   return (
     <div className="min-h-screen bg-rose-50 flex flex-col selection:bg-pink-200">
       
-      {/* 1. Header / Hero Section (Headline) - Gradiente Suave e Elegante */}
+      {/* 1. Header / Hero Section (Headline) */}
       <header className="bg-gradient-to-br from-[#fff5f5] via-[#fff0f3] to-[#ffe4e6] rounded-b-[4rem] shadow-md p-10 text-center relative z-20 border-b-4 border-white/50">
         <div className="relative inline-block mb-4">
           <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-[6px] border-white p-1 shadow-2xl mx-auto overflow-hidden bg-white floating">
@@ -108,23 +116,44 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* 2. Intro Video Section - Com Moldura Colorida Suave */}
-      <section className="max-w-md mx-auto w-full px-6 -mt-10 mb-14 relative z-30">
-        <div className="bg-gradient-to-b from-white to-pink-50 p-3.5 rounded-[3.5rem] shadow-2xl overflow-hidden border-[6px] border-white ring-2 ring-pink-100/50">
-          <div className="vimeo-container rounded-[2.5rem] shadow-inner bg-pink-50">
+      {/* 2. Intro Video Section - Aumentado e com opção de Som */}
+      <section className="max-w-xl mx-auto w-full px-4 -mt-10 mb-14 relative z-30">
+        <div className="bg-white p-3 rounded-[3.5rem] shadow-2xl overflow-hidden border-[8px] border-white ring-4 ring-pink-100/30 relative">
+          
+          {/* Proporção do vídeo ajustada de 16:9 para algo mais robusto 4:3 aprox */}
+          <div className="relative pt-[75%] md:pt-[65%] rounded-[2.8rem] shadow-inner bg-pink-50 overflow-hidden">
             <iframe 
-              src={`https://player.vimeo.com/video/${VIMEO_VIDEO_ID}?autoplay=1&muted=1&loop=1&background=1`} 
+              src={videoUrl} 
+              className="absolute top-0 left-0 w-full h-full"
               frameBorder="0" 
               allow="autoplay; fullscreen; picture-in-picture" 
               allowFullScreen
               title="Apresentação TH Personalizados"
             ></iframe>
+
+            {/* Overlay para clique interativo no som */}
+            <div 
+              onClick={toggleSound}
+              className="absolute inset-0 z-10 cursor-pointer flex items-center justify-center group"
+            >
+              {isMuted && (
+                <div className="bg-pink-500/80 backdrop-blur-sm text-white px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-2xl animate-bounce group-hover:scale-110 transition-transform">
+                  Ativar Som 🔊
+                </div>
+              )}
+              {!isMuted && (
+                <div className="absolute top-4 right-4 bg-white/50 backdrop-blur-sm p-2 rounded-full text-pink-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M13.5 4.06c0-1.333-1.611-1.999-2.553-1.057L5.432 8.515H2.25c-1.243 0-2.25 1.007-2.25 2.25v2.47c0 1.243 1.007 2.25 2.25 2.25h3.182l5.515 5.511c.942.942 2.553.276 2.553-1.057V4.06zM15.75 12c0-1.503-.81-2.822-2.025-3.54v7.08c1.215-.718 2.025-2.037 2.025-3.54z"/></svg>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="py-5 text-center">
+
+          <div className="py-6 text-center">
             <h2 className="text-pink-600 font-black text-2xl mb-1 drop-shadow-sm uppercase tracking-tighter">Mini Album Pixar</h2>
             <div className="flex justify-center items-center gap-3">
               <span className="h-1 w-8 bg-pink-200 rounded-full"></span>
-              <p className="text-pink-400 text-[11px] font-black uppercase tracking-[0.25em] animate-pulse">Personalize seu Amor</p>
+              <p className="text-pink-400 text-[11px] font-black uppercase tracking-[0.25em] animate-pulse">Toque no vídeo para ouvir ✨</p>
               <span className="h-1 w-8 bg-pink-200 rounded-full"></span>
             </div>
           </div>
@@ -134,7 +163,7 @@ const App: React.FC = () => {
       {/* 3. Main Content */}
       <main className="flex-grow w-full px-4 py-4 pb-32 max-w-lg mx-auto">
         
-        {/* Category Selector - Scrollable, Cute Pills */}
+        {/* Category Selector */}
         <div className="sticky top-4 z-40 mb-10 overflow-hidden">
           <div className="bg-white/90 backdrop-blur-md p-2 rounded-full shadow-2xl border-2 border-white/50 flex gap-2 overflow-x-auto no-scrollbar ring-1 ring-pink-100">
             {Object.values(Category).map(cat => (
